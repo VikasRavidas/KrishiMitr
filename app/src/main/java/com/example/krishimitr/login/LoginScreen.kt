@@ -213,7 +213,14 @@ fun LoginScreen(navController: NavController,mGoogleSignInClient: GoogleSignInCl
 
             OutlinedTextField(
                 value = email, // Bind with state
-                onValueChange = {email=it},
+
+                onValueChange = {
+                    if(it.length<=50){
+                        email = it
+                }
+                                else{
+                                    Toast.makeText(context,"Maximum  characters reached",Toast.LENGTH_SHORT).show()
+                                }},
                 label = { Text("Email or Username") },
                 leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
                 keyboardOptions = KeyboardOptions.Default.copy(
@@ -221,7 +228,9 @@ fun LoginScreen(navController: NavController,mGoogleSignInClient: GoogleSignInCl
                    // autoCorrect = true,
                     imeAction = ImeAction.Next,
 
-                    )
+                    ),
+                maxLines = 1, // Limit to a single line
+                singleLine = true // Ensures no vertical expansion
                 //modifier = Modifier.fillMaxWidth()
             )
 
@@ -230,7 +239,11 @@ fun LoginScreen(navController: NavController,mGoogleSignInClient: GoogleSignInCl
             // TextField for Password
             OutlinedTextField(
                 value = password, // Bind with state
-                onValueChange = {password =it},
+                onValueChange = {
+                    if(it.length<=30){
+                        password = it
+                    }
+                },
                 label = { Text("Password") },
                 leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
 
@@ -251,7 +264,9 @@ fun LoginScreen(navController: NavController,mGoogleSignInClient: GoogleSignInCl
                     imeAction = ImeAction.Done,
                 ),
                 visualTransformation = if (isPasswordVisible) VisualTransformation.None
-                else PasswordVisualTransformation()
+                else PasswordVisualTransformation(),
+                maxLines = 1, // Limit to a single line
+                singleLine = true // Ensures no vertical expansion
             )
 
 
