@@ -21,6 +21,13 @@ private val DarkColorScheme = darkColorScheme(
     tertiary = Pink80
 )
 
+private val LoginLightColorScheme = lightColorScheme(
+    primary = Purple40, // Change these colors as per your design
+    secondary = PurpleGrey40,
+    tertiary = Pink40
+    // You can add more colors if necessary
+)
+
 private val LightColorScheme = lightColorScheme(
     primary = Purple40,
     secondary = PurpleGrey40,
@@ -65,6 +72,15 @@ fun KrishiMitrTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
+        typography = Typography,
+        content = content
+    )
+}
+
+@Composable
+fun LoginTheme(content: @Composable () -> Unit) {
+    MaterialTheme(
+        colorScheme = LoginLightColorScheme,
         typography = Typography,
         content = content
     )

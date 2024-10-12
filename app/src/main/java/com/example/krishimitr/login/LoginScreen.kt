@@ -41,6 +41,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.constraintlayout.compose.Visibility
 import androidx.navigation.NavController
 import com.example.krishimitr.R
+import com.example.krishimitr.ui.theme.LoginTheme
 import com.example.krishimitr.ui.theme.Purple40
 import com.google.android.gms.auth.api.signin.GoogleSignIn.getSignedInAccountFromIntent
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -108,185 +109,189 @@ private const val TAG = "EmailPassword"
 @Composable
 fun LoginScreen(navController: NavController,mGoogleSignInClient: GoogleSignInClient) {
 
+    LoginTheme {
 
 
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var isPasswordVisible by remember { mutableStateOf(false) }
-    val auth = Firebase.auth
-    val context = LocalContext.current
-    var isRememberMeChecked by remember { mutableStateOf(false) }
+        var email by remember { mutableStateOf("") }
+        var password by remember { mutableStateOf("") }
+        var isPasswordVisible by remember { mutableStateOf(false) }
+        val auth = Firebase.auth
+        val context = LocalContext.current
+        var isRememberMeChecked by remember { mutableStateOf(false) }
 
-    val signInLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult(),
-        onResult = { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                val task = getSignedInAccountFromIntent(result.data)
-                task.addOnCompleteListener { signInTask ->
-                    if (signInTask.isSuccessful) {
-                        try {
-                            val account = signInTask.getResult(ApiException::class.java)!!
-                            val idToken = account.idToken
-                            val credential = GoogleAuthProvider.getCredential(idToken, null)
-                            Firebase.auth.signInWithCredential(credential)
-                                .addOnCompleteListener { authTask ->
-                                    if (authTask.isSuccessful) {
-                                        Toast.makeText(
-                                            context,
-                                            "Authentication Successful",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
+        val signInLauncher = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.StartActivityForResult(),
+            onResult = { result ->
+                if (result.resultCode == Activity.RESULT_OK) {
+                    val task = getSignedInAccountFromIntent(result.data)
+                    task.addOnCompleteListener { signInTask ->
+                        if (signInTask.isSuccessful) {
+                            try {
+                                val account = signInTask.getResult(ApiException::class.java)!!
+                                val idToken = account.idToken
+                                val credential = GoogleAuthProvider.getCredential(idToken, null)
+                                Firebase.auth.signInWithCredential(credential)
+                                    .addOnCompleteListener { authTask ->
+                                        if (authTask.isSuccessful) {
+                                            Toast.makeText(
+                                                context,
+                                                "Authentication Successful",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
 
-                                      //  navController.navigate(Screen.MainScreen.route){
-                                        //    popUpTo(0){
-                                        //        inclusive= true
-                                         //   }
-                                     //   }
-                                    } else {
-                                        Toast.makeText(
-                                            context,
-                                            "Authentication Failed: ${authTask.exception?.message}",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
+                                            //  navController.navigate(Screen.MainScreen.route){
+                                            //    popUpTo(0){
+                                            //        inclusive= true
+                                            //   }
+                                            //   }
+                                        } else {
+                                            Toast.makeText(
+                                                context,
+                                                "Authentication Failed: ${authTask.exception?.message}",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        }
                                     }
-                                }
-                        } catch (e: ApiException) {
+                            } catch (e: ApiException) {
+                                Toast.makeText(
+                                    context,
+                                    "Google Sign-In Failed: ${e.message}",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        } else {
                             Toast.makeText(
                                 context,
-                                "Google Sign-In Failed: ${e.message}",
+                                "Google Sign-In Task Failed: ${signInTask.exception?.message}",
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
-                    } else {
-                        Toast.makeText(
-                            context,
-                            "Google Sign-In Task Failed: ${signInTask.exception?.message}",
-                            Toast.LENGTH_SHORT
-                        ).show()
                     }
                 }
             }
-        }
-    )
-
-
-
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
-             // Add padding for the status bar
-    ) {
-        // Wave at the top
-
-       WaveHeader()
-
-        // Rest of the login form below the wave
-        //Spacer(modifier = , Modifier.height(20.dp)) // Spacing between wave and login form
-
-
-        Image(
-            painter =
-            painterResource(id = R.drawable.image),
-            contentDescription = "Top wave",
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(100.dp)
         )
-       // Spacer(modifier = Modifier.height(16.dp))
 
-        Text(
-            text = "Log in to your account",
-            style = MaterialTheme.typography.titleMedium,
+
+
+
+        Column(
             modifier = Modifier
-                .fillMaxWidth()  // Makes the text take full width
-                .padding(8.dp)   // Adds padding around the text
-                .wrapContentWidth(Alignment.CenterHorizontally)  // Centers the text horizontally
-        )
-        // Login form
-        Column(modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-
+                .fillMaxSize()
+                .background(Color.White)
+            // Add padding for the status bar
         ) {
+            // Wave at the top
 
-            OutlinedTextField(
-                value = email, // Bind with state
+            WaveHeader()
 
-                onValueChange = {
-                    if(it.length<=50){
-                        email = it
-                }
-                                else{
-                                    Toast.makeText(context,"Maximum  characters reached",Toast.LENGTH_SHORT).show()
-                                }},
-                label = { Text("Email or Username") },
-                leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    keyboardType = KeyboardType.Email,
-                   // autoCorrect = true,
-                    imeAction = ImeAction.Next,
+            // Rest of the login form below the wave
+            //Spacer(modifier = , Modifier.height(20.dp)) // Spacing between wave and login form
 
-                    ),
-                maxLines = 1, // Limit to a single line
-                singleLine = true // Ensures no vertical expansion
-                //modifier = Modifier.fillMaxWidth()
+
+            Image(
+                painter =
+                painterResource(id = R.drawable.image),
+                contentDescription = "Top wave",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(100.dp)
             )
+            // Spacer(modifier = Modifier.height(16.dp))
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "Log in to your account",
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier
+                    .fillMaxWidth()  // Makes the text take full width
+                    .padding(8.dp)   // Adds padding around the text
+                    .wrapContentWidth(Alignment.CenterHorizontally)  // Centers the text horizontally
+            )
+            // Login form
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
 
-            // TextField for Password
-            OutlinedTextField(
-                value = password, // Bind with state
-                onValueChange = {
-                    if(it.length<=30){
-                        password = it
-                    }
-                },
-                label = { Text("Password") },
-                leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
+                ) {
+
+                OutlinedTextField(
+                    value = email, // Bind with state
+
+                    onValueChange = {
+                        if (it.length <= 50) {
+                            email = it
+                        } else {
+                            Toast.makeText(
+                                context,
+                                "Maximum  characters reached",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    },
+                    label = { Text("Email or Username") },
+                    leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        keyboardType = KeyboardType.Email,
+                        // autoCorrect = true,
+                        imeAction = ImeAction.Next,
+
+                        ),
+                    maxLines = 1, // Limit to a single line
+                    singleLine = true // Ensures no vertical expansion
+                    //modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // TextField for Password
+                OutlinedTextField(
+                    value = password, // Bind with state
+                    onValueChange = {
+                        if (it.length <= 30) {
+                            password = it
+                        }
+                    },
+                    label = { Text("Password") },
+                    leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
 
 //                modifier = Modifier.fillMaxWidth(),
 //                visualTransformation = PasswordVisualTransformation() // Hide password
 //                ,
-                trailingIcon = {
-                    IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
-                        Icon(
-                            imageVector = if (isPasswordVisible) Icons.Default.Visibility
-                            else Icons.Default.VisibilityOff,
-                            contentDescription = "Visibility Toggle"
-                        )
-                    }
-                },
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    keyboardType = KeyboardType.Password,
-                    imeAction = ImeAction.Done,
-                ),
-                visualTransformation = if (isPasswordVisible) VisualTransformation.None
-                else PasswordVisualTransformation(),
-                maxLines = 1, // Limit to a single line
-                singleLine = true // Ensures no vertical expansion
-            )
+                    trailingIcon = {
+                        IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
+                            Icon(
+                                imageVector = if (isPasswordVisible) Icons.Default.Visibility
+                                else Icons.Default.VisibilityOff,
+                                contentDescription = "Visibility Toggle"
+                            )
+                        }
+                    },
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        keyboardType = KeyboardType.Password,
+                        imeAction = ImeAction.Done,
+                    ),
+                    visualTransformation = if (isPasswordVisible) VisualTransformation.None
+                    else PasswordVisualTransformation(),
+                    maxLines = 1, // Limit to a single line
+                    singleLine = true // Ensures no vertical expansion
+                )
 
 
+                //Spacer(modifier = Modifier.height(8.dp))
 
-
-            //Spacer(modifier = Modifier.height(8.dp))
-
-            // Row for Remember Me and Forgot Password
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Checkbox(checked = isRememberMeChecked,
-                        onCheckedChange = {
+                // Row for Remember Me and Forgot Password
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Checkbox(checked = isRememberMeChecked,
+                            onCheckedChange = {
                                 isRememberMeChecked = it
-                    })
-                    Text("Remember Me")
-                }
+                            })
+                        Text("Remember Me")
+                    }
 
 
 
@@ -314,141 +319,147 @@ fun LoginScreen(navController: NavController,mGoogleSignInClient: GoogleSignInCl
                                         }
                                     }
                             } else {
-                                Toast.makeText(context, "Please enter your email", Toast.LENGTH_SHORT)
+                                Toast.makeText(
+                                    context,
+                                    "Please enter your email",
+                                    Toast.LENGTH_SHORT
+                                )
                                     .show()
                             }
                         }
                     )
 
-            }
+                }
 
-            //Spacer(modifier = Modifier.height(4.dp))
+                //Spacer(modifier = Modifier.height(4.dp))
 
-            // Sign In Button
-            Button(
-                onClick = {
-                    if (email.isEmpty() || password.isEmpty()) {
-                        Log.d(TAG, "signInWithEmail:null")
-                        Toast.makeText(
-                           navController.context,
-                            "Enter the credentials",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    } else auth.signInWithEmailAndPassword(email, password)
-                        .addOnCompleteListener { task ->
-                            if (task.isSuccessful) {
-                                Log.d(TAG, "signInWithEmail:success")
-                                Toast.makeText(
-                                    navController.context,
-                                    "Logging in",
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                // Sign In Button
+                Button(
+                    onClick = {
+                        if (email.isEmpty() || password.isEmpty()) {
+                            Log.d(TAG, "signInWithEmail:null")
+                            Toast.makeText(
+                                navController.context,
+                                "Enter the credentials",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        } else auth.signInWithEmailAndPassword(email, password)
+                            .addOnCompleteListener { task ->
+                                if (task.isSuccessful) {
+                                    Log.d(TAG, "signInWithEmail:success")
+                                    Toast.makeText(
+                                        navController.context,
+                                        "Logging in",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
 //                                navController.navigate(Screen.MainScreen.route)
 //                                {
 //                                    popUpTo(navController.graph.startDestinationId)
 //                                    launchSingleTop = true
 //                                }
 
-                            } else {
-                                Log.w(TAG, "signInWithEmail:failure", task.exception)
-                                Toast.makeText(
-                                  navController.context,
-                                    "Authentication failed.",
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                                } else {
+                                    Log.w(TAG, "signInWithEmail:failure", task.exception)
+                                    Toast.makeText(
+                                        navController.context,
+                                        "Authentication failed.",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
 
-                              //  updateUI(null)
+                                    //  updateUI(null)
+                                }
                             }
-                        }
-                },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)) // Green
-            ) {
-                Text("Sign In", color = Color.White)
-            }
-    Spacer(modifier = Modifier.height(16.dp))
-            HorizontalDivider()
-
-            Box(   //..................Google Sign In ...........................................//
-                Modifier.clickable {
-                  signInLauncher.launch(mGoogleSignInClient.signInIntent)
-                }
-            ) {
-                Column(
-                    modifier = Modifier,
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)) // Green
                 ) {
-                    Spacer(modifier = Modifier.padding(2.dp))
+                    Text("Sign In", color = Color.White)
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+                HorizontalDivider()
 
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
+                Box(   //..................Google Sign In ...........................................//
+                    Modifier.clickable {
+                        signInLauncher.launch(mGoogleSignInClient.signInIntent)
+                    }
+                ) {
+                    Column(
+                        modifier = Modifier,
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Icon(
-                            imageVector = ImageVector.Companion.vectorResource(id = R.drawable.google_icon),
-                            contentDescription = "Google Icon",
-                            tint = Color.Unspecified,
-                            modifier = Modifier.size(40.dp)
-                        )
+                        Spacer(modifier = Modifier.padding(2.dp))
 
-                        Text(
-                            text = "Sign In with Google", modifier = Modifier.padding(10.dp, 0.dp),
-                            color = Purple40, fontWeight = FontWeight.Bold
-                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = ImageVector.Companion.vectorResource(id = R.drawable.google_icon),
+                                contentDescription = "Google Icon",
+                                tint = Color.Unspecified,
+                                modifier = Modifier.size(40.dp)
+                            )
+
+                            Text(
+                                text = "Sign In with Google",
+                                modifier = Modifier.padding(10.dp, 0.dp),
+                                color = Purple40,
+                                fontWeight = FontWeight.Bold
+                            )
+
+                        }
+
 
                     }
 
 
-
                 }
 
-
-            }
-
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(12.dp)
-                    .height(42.dp), // Add padding around the card
-                elevation =CardDefaults.elevatedCardElevation(4.dp),
-                // Add some elevation for a shadow effect
-                colors = CardDefaults.cardColors(Color.White),
-                shape = MaterialTheme.shapes.medium // Use medium shape for rounded corners
-                ,
-                onClick ={
-
-                }
-
-            ) {
-                Row(
+                Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(12.dp), // Padding inside the card
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
+                        .padding(12.dp)
+                        .height(42.dp), // Add padding around the card
+                    elevation = CardDefaults.elevatedCardElevation(4.dp),
+                    // Add some elevation for a shadow effect
+                    colors = CardDefaults.cardColors(Color.White),
+                    shape = MaterialTheme.shapes.medium // Use medium shape for rounded corners
+                    ,
+                    onClick = {
+
+                    }
+
                 ) {
-                    Text(
-                        text = "Don't have an account?",
-                        style = TextStyle(
-                            color = Color.Black,
-                            fontSize = 14.sp
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp), // Padding inside the card
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Don't have an account?",
+                            style = TextStyle(
+                                color = Color.Black,
+                                fontSize = 14.sp
+                            )
                         )
-                    )
-                     Spacer(modifier = Modifier.width(8.dp)) // Adjusted spacer width
+                        Spacer(modifier = Modifier.width(8.dp)) // Adjusted spacer width
 
                         Text(
                             text = "Sign Up",
                             style = TextStyle(
-                                 color = MaterialTheme.colorScheme.primary, // Use primary color for emphasis
+                                color = MaterialTheme.colorScheme.primary, // Use primary color for emphasis
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold // Make it bold for emphasis
                             )
                         )
 
+                    }
                 }
             }
         }
     }
-}
 
+}
