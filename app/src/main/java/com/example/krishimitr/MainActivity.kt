@@ -15,6 +15,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.krishimitr.login.LoginScreen
 import com.example.krishimitr.ui.theme.KrishiMitrTheme
@@ -31,7 +34,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var mGoogleSignInClient: GoogleSignInClient
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        installSplashScreen()
         enableEdgeToEdge()
         val auth: FirebaseAuth?
         auth = Firebase.auth
@@ -41,12 +44,21 @@ class MainActivity : ComponentActivity() {
             .requestEmail()
             .build()
         mGoogleSignInClient = getClient(this, gso)
+
         setContent {
             KrishiMitrTheme {
-            val navController= rememberNavController()
-                        LoginScreen(navController = navController, mGoogleSignInClient =mGoogleSignInClient)
+                val navController = rememberNavController()
+                NavHost(
+                    navController = navController,
+                    startDestination = Screen.LoginScreen.route
+                ) {
+                    composable(route = Screen.LoginScreen.route) {
+                        LoginScreen(navController, mGoogleSignInClient)
+
+                    }
 
 
+                }
             }
         }
     }

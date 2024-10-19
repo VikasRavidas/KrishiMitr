@@ -178,9 +178,9 @@ fun LoginScreen(navController: NavController,mGoogleSignInClient: GoogleSignInCl
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color.White)
-            // Add padding for the status bar
+
         ) {
-            // Wave at the top
+
 
             WaveHeader()
 
@@ -202,8 +202,8 @@ fun LoginScreen(navController: NavController,mGoogleSignInClient: GoogleSignInCl
                 text = "Log in to your account",
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier
-                    .fillMaxWidth()  // Makes the text take full width
-                    .padding(8.dp)   // Adds padding around the text
+                    .fillMaxWidth()
+                    .padding(8.dp)
                     .wrapContentWidth(Alignment.CenterHorizontally)  // Centers the text horizontally
             )
             // Login form

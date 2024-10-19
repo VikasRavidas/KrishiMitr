@@ -77,4 +77,6 @@ dependencies {
     implementation (libs.androidx.navigation.compose)
     //icon-extended
     implementation(libs.androidx.material.icons.extended)
+    //splash Screen
+    implementation(libs.androidx.core.splashscreen)
 }
