@@ -79,4 +79,6 @@ dependencies {
     implementation(libs.androidx.material.icons.extended)
     //splash Screen
     implementation(libs.androidx.core.splashscreen)
+    //AsyncImage
+    implementation(libs.coil.compose) //
 }

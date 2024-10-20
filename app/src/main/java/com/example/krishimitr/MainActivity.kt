@@ -20,6 +20,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.krishimitr.login.LoginScreen
+import com.example.krishimitr.screens.ContactScreen
+import com.example.krishimitr.screens.HistoryScreen
+import com.example.krishimitr.screens.MainScreen
+import com.example.krishimitr.screens.ProfileScreen
 import com.example.krishimitr.ui.theme.KrishiMitrTheme
 import com.google.android.gms.auth.api.signin.GoogleSignIn.getClient
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -50,14 +54,30 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 NavHost(
                     navController = navController,
-                    startDestination = Screen.LoginScreen.route
+                    startDestination = if(currentUser!=null){
+                        Screen.Main.route}
+                            else{
+                        Screen.Login.route
+                    }
                 ) {
-                    composable(route = Screen.LoginScreen.route) {
+                    composable(route = Screen.Login.route) {
                         LoginScreen(navController, mGoogleSignInClient)
 
                     }
+                    composable(route = Screen.Main.route) {
+                        MainScreen(navController = navController)
+                    }
+                    composable(route = Screen.Profile.route) {
+                        ProfileScreen(navController = navController)
+                    }
+                    composable(route = Screen.History.route) {
+                        HistoryScreen(navController = navController)
+                    }
+                    composable(route = Screen.Contact.route) {
+                        ContactScreen(navController = navController)
 
 
+                    }
                 }
             }
         }

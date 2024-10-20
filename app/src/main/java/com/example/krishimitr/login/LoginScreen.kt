@@ -41,6 +41,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.constraintlayout.compose.Visibility
 import androidx.navigation.NavController
 import com.example.krishimitr.R
+import com.example.krishimitr.Screen
 import com.example.krishimitr.ui.theme.LoginTheme
 import com.example.krishimitr.ui.theme.Purple40
 import com.google.android.gms.auth.api.signin.GoogleSignIn.getSignedInAccountFromIntent
@@ -139,11 +140,11 @@ fun LoginScreen(navController: NavController,mGoogleSignInClient: GoogleSignInCl
                                                 Toast.LENGTH_SHORT
                                             ).show()
 
-                                            //  navController.navigate(Screen.MainScreen.route){
-                                            //    popUpTo(0){
-                                            //        inclusive= true
-                                            //   }
-                                            //   }
+                                              navController.navigate(Screen.Main.route){
+                                                popUpTo(0){
+                                                    inclusive= true
+                                               }
+                                               }
                                         } else {
                                             Toast.makeText(
                                                 context,
@@ -352,11 +353,11 @@ fun LoginScreen(navController: NavController,mGoogleSignInClient: GoogleSignInCl
                                         "Logging in",
                                         Toast.LENGTH_SHORT
                                     ).show()
-//                                navController.navigate(Screen.MainScreen.route)
-//                                {
-//                                    popUpTo(navController.graph.startDestinationId)
-//                                    launchSingleTop = true
-//                                }
+                                navController.navigate(Screen.Main.route)
+                                {
+                                    popUpTo(navController.graph.startDestinationId)
+                                    launchSingleTop = true
+                                }
 
                                 } else {
                                     Log.w(TAG, "signInWithEmail:failure", task.exception)
