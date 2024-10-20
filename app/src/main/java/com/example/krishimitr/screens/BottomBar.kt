@@ -9,6 +9,10 @@ import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Leaderboard
 import androidx.compose.material.icons.filled.People
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Person2
+import androidx.compose.material.icons.filled.Person3
+import androidx.compose.material.icons.filled.Person4
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -32,7 +36,7 @@ fun BottomNavigationBar(
     currentRoute:String?
 ) {
     val items = listOf("Home", "Profile", "Contact","History")
-    val icons = listOf(Icons.Default.Home, Icons.Default.People, Icons.Default.Call, Icons.Default.Cached)
+    val icons = listOf(Icons.Default.Home, Icons.Default.Person4, Icons.Default.Call, Icons.Default.Cached)
     val selectedIndex = when (currentRoute) {
         Screen.Home.route -> 0
         Screen.Profile.route -> 1

@@ -275,7 +275,8 @@ fun MainScreen(navController: NavController){
         Scaffold(
             containerColor = Color.White,
             topBar = {
-                 CenterAlignedTopAppBar(
+                if(currentRoute!=Screen.Profile.route) {
+                    CenterAlignedTopAppBar(
                         colors = topAppBarColors(
                             containerColor = Color.White,
                         ),
@@ -322,8 +323,7 @@ fun MainScreen(navController: NavController){
                     )
 
 
-
-
+                }
             },
             bottomBar = {
 
