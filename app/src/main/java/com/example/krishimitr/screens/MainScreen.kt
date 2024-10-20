@@ -275,7 +275,7 @@ fun MainScreen(navController: NavController){
         Scaffold(
             containerColor = Color.White,
             topBar = {
-                if(currentRoute!=Screen.Profile.route) {
+                if(currentRoute==Screen.Home.route) {
                     CenterAlignedTopAppBar(
                         colors = topAppBarColors(
                             containerColor = Color.White,
