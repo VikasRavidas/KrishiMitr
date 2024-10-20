@@ -92,6 +92,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.drawscope.translate
@@ -101,29 +103,35 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 
-
 @Composable
-fun ProfileScreen(navController: NavController){
+fun ProfileScreen(navController: NavController) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(
+                brush = Brush.verticalGradient(
+                   // colors = listOf(Color(0xFFEDE7F6), Color(0xFF80DEEA))
+                    colors = listOf(Color(0xFFE8F5E9), Color(0xFF388E3C))
+                )
+            )
     ) {
         // Custom curved background
         CurvedBackground()
 
         Column(
             modifier = Modifier
-                .fillMaxSize(),
+                .fillMaxSize()
+                .padding(16.dp), // Add padding to the entire screen
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(90.dp)) // Spacing from the top
+            Spacer(modifier = Modifier.height(60.dp)) // Spacing from the top
 
-            // Avatar
+            // Avatar with shadow
             Box(
                 modifier = Modifier
                     .size(100.dp)
                     .clip(CircleShape)
+                    .border(BorderStroke(.2.dp, Color.Green), CircleShape)
                     .background(Color.White),
                 contentAlignment = Alignment.Center
             ) {
@@ -134,69 +142,68 @@ fun ProfileScreen(navController: NavController){
                     modifier = Modifier.size(80.dp)
                 )
             }
+            Spacer(modifier = Modifier.height(16.dp))
 
-          //  Spacer(modifier = Modifier.height(16.dp))
-
-            // User Details
-            Column(
+            // User Details Card
+            Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp))
-                    .background(Color.White)
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.Start
+                    .clip(RoundedCornerShape(16.dp)),
+                elevation = CardDefaults.elevatedCardElevation(4.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White)
             ) {
-                Text(
-                    text = "Ramayya",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 4.dp)
-                )
-                Text(
-                    text = "User Id: 5613312982",
-                    fontSize = 14.sp,
-                    color = Color.Gray,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-
-                UserDetailRow(label = "Name", value = "Ramayya Suresh")
-                UserDetailRow(label = "Email", value = "Ramayyasuresh2004@gmail.com")
-                UserDetailRow(label = "Password", value = "*******")
-                UserDetailRow(label = "Mobile Number", value = "8248678540")
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                // Update Profile & Settings Buttons
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
+                Column(
+                    modifier = Modifier
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.Start
                 ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth()
+                            .padding(bottom = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Column (
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ){
+                            Text(
+                                text = "Ramayya",
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(bottom = 4.dp),
+                                color = Color(0xFF2E7D32)
+                            )
+                            Text(
+                                text = "User Id: 5613312982",
+                                fontSize = 14.sp,
+                                color = Color.Gray,
+                                modifier = Modifier.padding(bottom = 16.dp)
+                            )
+                        }
+                        }
+
+                    UserDetailRow(label = "Name", value = "Ramayya Suresh")
+                    UserDetailRow(label = "Email", value = "Ramayyasuresh2004@gmail.com")
+                    UserDetailRow(label = "Password", value = "*******")
+                    UserDetailRow(label = "Mobile Number", value = "8248678540")
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    // Update Profile Button
                     Button(
                         onClick = { /* Handle Update Profile */ },
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF388E3C), // Background color of the button
-                            contentColor = Color.White // Text color inside the button
+                            containerColor = Color(0xFF388E3C),
+                            contentColor = Color.White
                         ),
                         modifier = Modifier
-                            .weight(1f)
+                            .fillMaxWidth()
                             .padding(horizontal = 8.dp)
                             .clip(RoundedCornerShape(16.dp))
                     ) {
                         Text(text = "UPDATE PROFILE")
                     }
-//                    Button(
-//                        onClick = { /* Handle Settings */ },
-//                        colors = ButtonDefaults.buttonColors(
-//                            containerColor = Color(0xFF388E3C), // Background color of the button
-//                            contentColor = Color.White // Text color inside the button
-//                        ),
-//                        modifier = Modifier
-//                            .weight(1f)
-//                            .padding(horizontal = 8.dp)
-//                            .clip(RoundedCornerShape(16.dp))
-//                    ) {
-//                        Text(text = "SETTINGS")
-//                    }
                 }
             }
         }
@@ -243,6 +250,7 @@ fun UserDetailRow(label: String, value: String) {
         )
     }
 }
+
 @Preview(showBackground = true)
 @Composable
 fun PreviewKrishiMitrProfileUI() {
