@@ -20,6 +20,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.krishimitr.login.LoginScreen
+import com.example.krishimitr.login.SignUpScreen
 import com.example.krishimitr.screens.ContactScreen
 import com.example.krishimitr.screens.HistoryScreen
 import com.example.krishimitr.screens.MainScreen
@@ -75,8 +76,9 @@ class MainActivity : ComponentActivity() {
                     }
                     composable(route = Screen.Contact.route) {
                         ContactScreen(navController = navController)
-
-
+                    }
+                    composable(route = Screen.SignUp.route) {
+                        SignUpScreen(navController = navController)
                     }
                 }
             }

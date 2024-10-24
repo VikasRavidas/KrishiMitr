@@ -71,6 +71,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import coil.size.Size
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -88,6 +89,7 @@ fun MainScreen(navController: NavController){
     var userEmail by remember { mutableStateOf("Loading...") }
     var userPhotoUrl by remember { mutableStateOf<String?>(null) }
     val auth: FirebaseAuth = Firebase.auth
+    val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
 
 
     // Fetch user details
@@ -97,6 +99,20 @@ fun MainScreen(navController: NavController){
             userName = it.displayName ?: "Anonymous"
             userEmail = it.email ?: "No Email"
             userPhotoUrl = it.photoUrl?.toString()
+                ?: "https://th.bing.com/th/id/R.7cc8de4020756a6b9d8a6aeb4441d188?rik=1ChCG5Z9Fc6FTQ&riu=http%3a%2f%2fgetdrawings.com%2ffree-icon%2ffacebook-avatar-icon-57.png&ehk=KTLTz0tf%2bVA8%2fB5pCKnDw%2fX%2fm1GcCpXkqxSR%2bM2aEg4%3d&risl=&pid=ImgRaw&r=0"
+
+            val userId = currentUser.uid
+            val userDocument = firestore.collection("users").document(userId)
+
+            userDocument.get()
+                .addOnSuccessListener { document ->
+                    if (document != null && document.exists()) {
+                        userName = document.getString("username") ?: "Anonymous"
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    Log.e("Firestore", "Error fetching user data: ", exception)
+                }
         }
     }
 

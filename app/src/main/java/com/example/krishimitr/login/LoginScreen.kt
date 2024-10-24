@@ -10,6 +10,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 //noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.* // Material 2 imports
@@ -22,6 +23,8 @@ import androidx.compose.material3.* // Material 3 imports
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.FocusRequester.Companion.createRefs
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.text.TextStyle
@@ -30,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.graphics.drawscope.clipPath
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -38,6 +42,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import androidx.constraintlayout.compose.Visibility
 import androidx.navigation.NavController
 import com.example.krishimitr.R
@@ -50,61 +56,6 @@ import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-
-@Composable
-fun WaveHeader() {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(200.dp) // Adjust height as necessary for the wave
-            .background(Color.White)
-    ) {
-        // Column to stack Canvas and Text vertically
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Bottom // Aligns children at the bottom
-        ) {
-            Canvas(
-                modifier = Modifier
-                    .fillMaxWidth() // This will fill the entire Box
-                    .weight(1f) // This gives the canvas weight, filling space above the text
-            ) {
-                val width = size.width
-                val height = size.height
-
-                // Create the path for the wave
-                val path = Path().apply {
-                    moveTo(0f, height * 0.6f) // Start wave
-                    quadraticBezierTo(
-                        width * 0.25f, height * 0.4f, // Control point 1
-                        width * 0.5f, height * 0.6f  // Mid point of wave
-                    )
-                    quadraticBezierTo(
-                        width * 0.75f, height * 0.8f, // Control point 2
-                        width, height * 0.6f  // End point
-                    )
-                    lineTo(width, 0f) // Top-right corner
-                    lineTo(0f, 0f) // Top-left corner
-                    close()
-                }
-
-                drawPath(
-                    path = path,
-                    color = Color(0xFF267B37) // Green wave color
-                )
-            }
-            // Aligns text at the bottom of the Box, below the canvas
-            Text(
-                text = "KrishiMitr",
-                style = MaterialTheme.typography.headlineLarge,
-                modifier = Modifier
-                    .fillMaxWidth()  // Makes the text take full width
-                    .padding(16.dp)   // Adds padding around the text
-                    .wrapContentWidth(Alignment.CenterHorizontally)  // Centers the text horizontally
-            )
-        }
-    }
-}
 
 private const val TAG = "EmailPassword"
 @Composable
@@ -121,10 +72,13 @@ fun LoginScreen(navController: NavController,mGoogleSignInClient: GoogleSignInCl
         var isRememberMeChecked by remember { mutableStateOf(false) }
 
         val signInLauncher = rememberLauncherForActivityResult(
+//            Log.d(TAG, "signInWithEmail:success")
             contract = ActivityResultContracts.StartActivityForResult(),
             onResult = { result ->
+                Log.d(TAG, "SignIn Result: resultCode=${result.resultCode}")
                 if (result.resultCode == Activity.RESULT_OK) {
                     val task = getSignedInAccountFromIntent(result.data)
+                    Log.d(TAG, "SignIn Task: isSuccessful=${task.isSuccessful}")
                     task.addOnCompleteListener { signInTask ->
                         if (signInTask.isSuccessful) {
                             try {
@@ -169,6 +123,11 @@ fun LoginScreen(navController: NavController,mGoogleSignInClient: GoogleSignInCl
                         }
                     }
                 }
+                else if (result.resultCode == 0) {
+                    // Handle canceled or failed sign-in
+                    Log.e(TAG, "SignIn Result: resultCode=0, data=${result.data}")
+                    Toast.makeText(context, "Google Sign-In canceled or failed.", Toast.LENGTH_SHORT).show()
+                }
             }
         )
 
@@ -183,19 +142,48 @@ fun LoginScreen(navController: NavController,mGoogleSignInClient: GoogleSignInCl
         ) {
 
 
-            WaveHeader()
-
+//            WaveHeader()
             // Rest of the login form below the wave
             //Spacer(modifier = , Modifier.height(20.dp)) // Spacing between wave and login form
-
-
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(20.dp) // Adjust height as necessary for the wave
+                    .background(Color.White)
+            )
+            Image(
+                painter =
+                painterResource(id = R.drawable.wave),
+                contentDescription = "Top wave",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+                    .graphicsLayer { scaleX=1f;scaleY=0.9f }
+            )
+            Text(
+                text = "Welcome Back",
+                style = MaterialTheme.typography.headlineLarge,
+                modifier = Modifier
+                    .fillMaxWidth()  // Makes the text take full width
+                    .padding(1.dp)
+                    .padding(top=20.dp)
+                    .wrapContentWidth(Alignment.CenterHorizontally)  // Centers the text horizontall
+            )
+            Text(
+                text = "KrishiMitr",
+                style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Bold),
+                modifier = Modifier
+                    .fillMaxWidth()  // Makes the text take full width
+//                    .padding(16.dp)   // Adds padding around the text
+                    .wrapContentWidth(Alignment.CenterHorizontally)  // Centers the text horizontall
+            )
             Image(
                 painter =
                 painterResource(id = R.drawable.image),
                 contentDescription = "Top wave",
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(100.dp)
+                    .height(80.dp)
             )
             // Spacer(modifier = Modifier.height(16.dp))
 
@@ -231,6 +219,7 @@ fun LoginScreen(navController: NavController,mGoogleSignInClient: GoogleSignInCl
                     },
                     label = { Text("Email or Username") },
                     leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
+                    shape = RoundedCornerShape(20.dp),
                     keyboardOptions = KeyboardOptions.Default.copy(
                         keyboardType = KeyboardType.Email,
                         // autoCorrect = true,
@@ -238,8 +227,8 @@ fun LoginScreen(navController: NavController,mGoogleSignInClient: GoogleSignInCl
 
                         ),
                     maxLines = 1, // Limit to a single line
-                    singleLine = true // Ensures no vertical expansion
-                    //modifier = Modifier.fillMaxWidth()
+                    singleLine = true, // Ensures no vertical expansion
+
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -254,6 +243,7 @@ fun LoginScreen(navController: NavController,mGoogleSignInClient: GoogleSignInCl
                     },
                     label = { Text("Password") },
                     leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
+                    shape = RoundedCornerShape(20.dp),
 
 //                modifier = Modifier.fillMaxWidth(),
 //                visualTransformation = PasswordVisualTransformation() // Hide password
@@ -274,7 +264,8 @@ fun LoginScreen(navController: NavController,mGoogleSignInClient: GoogleSignInCl
                     visualTransformation = if (isPasswordVisible) VisualTransformation.None
                     else PasswordVisualTransformation(),
                     maxLines = 1, // Limit to a single line
-                    singleLine = true // Ensures no vertical expansion
+                    singleLine = true ,
+
                 )
 
 
@@ -377,18 +368,46 @@ fun LoginScreen(navController: NavController,mGoogleSignInClient: GoogleSignInCl
                     Text("Sign In", color = Color.White)
                 }
                 Spacer(modifier = Modifier.height(16.dp))
-                HorizontalDivider()
+//                HorizontalDivider()
 
-                Box(   //..................Google Sign In ...........................................//
-                    Modifier.clickable {
-                        signInLauncher.launch(mGoogleSignInClient.signInIntent)
-                    }
+                ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
+                    val (divider, text) = createRefs()
+
+                    HorizontalDivider(
+                        modifier = Modifier.constrainAs(divider) {
+                            centerHorizontallyTo(parent)
+                            centerVerticallyTo(parent)
+                            width = Dimension.fillToConstraints
+                        }
+                    )
+
+                    Text(
+                        text = "or",
+                        modifier = Modifier
+                            .background(Color.White)
+                            .padding(horizontal = 8.dp)
+                            .constrainAs(text) {
+                                centerHorizontallyTo(parent)
+                                centerVerticallyTo(divider) // Align with the divider vertically
+                            }
+                    )
+                }
+                Box(
+                    modifier = Modifier
+                        .clickable { signInLauncher.launch(mGoogleSignInClient.signInIntent) }
+                        .shadow(
+                            elevation = 4.dp, // Adjust the elevation for the desired shadow intensity
+                            shape = RoundedCornerShape(8.dp) // Optional: Add rounded corners to the shadow
+                        )
+                        .background(Color.White) // Set the background color of the Box
+                        .padding(4.dp) // Add padding around the content
+                        .width(245.dp)
                 ) {
+                    // Your Google Sign-In button content here
                     Column(
                         modifier = Modifier,
                         horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Spacer(modifier = Modifier.padding(2.dp))
+                    ) {Spacer(modifier = Modifier.padding(2.dp))
 
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -403,39 +422,22 @@ fun LoginScreen(navController: NavController,mGoogleSignInClient: GoogleSignInCl
                             )
 
                             Text(
-                                text = "Sign In with Google",
-                                modifier = Modifier.padding(10.dp, 0.dp),
+                                text = "Login With Google",
+                                modifier = Modifier.padding(3.dp, 0.dp),
                                 color = Purple40,
                                 fontWeight = FontWeight.Bold
                             )
-
                         }
-
-
                     }
-
-
                 }
 
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(12.dp)
-                        .height(42.dp), // Add padding around the card
-                    elevation = CardDefaults.elevatedCardElevation(4.dp),
-                    // Add some elevation for a shadow effect
-                    colors = CardDefaults.cardColors(Color.White),
-                    shape = MaterialTheme.shapes.medium // Use medium shape for rounded corners
-                    ,
-                    onClick = {
 
-                    }
 
-                ) {
+
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(12.dp), // Padding inside the card
+                            .padding(top=30.dp), // Padding inside the card
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -454,7 +456,11 @@ fun LoginScreen(navController: NavController,mGoogleSignInClient: GoogleSignInCl
                                 color = MaterialTheme.colorScheme.primary, // Use primary color for emphasis
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold // Make it bold for emphasis
-                            )
+                            ) ,
+                            modifier = Modifier.clickable {
+                                Log.d(TAG, "Sign Up")
+                                navController.navigate(Screen.SignUp.route)
+                            }
                         )
 
                     }
@@ -463,4 +469,3 @@ fun LoginScreen(navController: NavController,mGoogleSignInClient: GoogleSignInCl
         }
     }
 
-}
