@@ -373,6 +373,9 @@ fun NestedNavHost(navController: NavController) {
         composable(Screen.History.route) {
             HistoryScreen(navController = navController)
         }
+        composable(Screen.NewsScheme.route) {
+            NewsSchemeScreen(navController = navController)
+        }
 
 
     }

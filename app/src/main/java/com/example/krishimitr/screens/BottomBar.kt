@@ -6,8 +6,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Cached
 import androidx.compose.material.icons.filled.Call
+import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Leaderboard
+import androidx.compose.material.icons.filled.Newspaper
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Person2
@@ -35,11 +37,11 @@ fun BottomNavigationBar(
     navController: NavController,
     currentRoute:String?
 ) {
-    val items = listOf("Home", "Profile", "Contact","History")
-    val icons = listOf(Icons.Default.Home, Icons.Default.Person4, Icons.Default.Call, Icons.Default.Cached)
+    val items = listOf("Home", "News", "Contact","History")
+    val icons = listOf(Icons.Default.Home, Icons.Filled.Newspaper, Icons.Default.Call, Icons.Default.Cached)
     val selectedIndex = when (currentRoute) {
         Screen.Home.route -> 0
-        Screen.Profile.route -> 1
+        Screen.NewsScheme.route -> 1
         Screen.Contact.route -> 2
       Screen.History.route -> 3
         else -> 0 // Default to "Home" if route is unknown
@@ -81,7 +83,7 @@ fun BottomNavigationBar(
 //                            popUpTo(navController.graph.startDestinationId)
 //                            launchSingleTop = true
 //                        }
-                        "Profile" -> navController.navigate(Screen.Profile.route)
+                        "News" -> navController.navigate(Screen.NewsScheme.route)
 //                        {
 //                            popUpTo(navController.graph.startDestinationId)
 //                            launchSingleTop = true
