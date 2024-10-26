@@ -184,11 +184,6 @@ fun LoginScreen(navController: NavController,mGoogleSignInClient: GoogleSignInCl
 
 
             WaveHeader()
-
-            // Rest of the login form below the wave
-            //Spacer(modifier = , Modifier.height(20.dp)) // Spacing between wave and login form
-
-
             Image(
                 painter =
                 painterResource(id = R.drawable.image),
@@ -205,9 +200,9 @@ fun LoginScreen(navController: NavController,mGoogleSignInClient: GoogleSignInCl
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(8.dp)
-                    .wrapContentWidth(Alignment.CenterHorizontally)  // Centers the text horizontally
+                    .wrapContentWidth(Alignment.CenterHorizontally)
             )
-            // Login form
+
             Column(
                 modifier = Modifier.padding(16.dp),
                 verticalArrangement = Arrangement.Center,
@@ -216,7 +211,7 @@ fun LoginScreen(navController: NavController,mGoogleSignInClient: GoogleSignInCl
                 ) {
 
                 OutlinedTextField(
-                    value = email, // Bind with state
+                    value = email,
 
                     onValueChange = {
                         if (it.length <= 50) {
@@ -237,8 +232,8 @@ fun LoginScreen(navController: NavController,mGoogleSignInClient: GoogleSignInCl
                         imeAction = ImeAction.Next,
 
                         ),
-                    maxLines = 1, // Limit to a single line
-                    singleLine = true // Ensures no vertical expansion
+                    maxLines = 1,
+                    singleLine = true
                     //modifier = Modifier.fillMaxWidth()
                 )
 
@@ -280,7 +275,6 @@ fun LoginScreen(navController: NavController,mGoogleSignInClient: GoogleSignInCl
 
                 //Spacer(modifier = Modifier.height(8.dp))
 
-                // Row for Remember Me and Forgot Password
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,

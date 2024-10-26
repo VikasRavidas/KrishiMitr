@@ -91,51 +91,68 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.KeyboardType
 
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.krishimitr.room.AppDatabase
+import com.example.krishimitr.room.UserRepository
+import com.example.krishimitr.room.UserViewModel
+import com.example.krishimitr.room.UserViewModelFactory
 
 
 @Composable
 fun ProfileScreen(navController: NavController) {
+    val context = LocalContext.current
+    val userDao = AppDatabase.getDatabase(context).userDao()
+    val userRepository = UserRepository(userDao)
+    val userViewModel: UserViewModel = viewModel(factory = UserViewModelFactory(userRepository))
+
+    val userState by userViewModel.user.observeAsState()
+    val updateStatus by userViewModel.updateStatus.observeAsState()
+
+    // Log the user state to see if it's being populated
+    Log.d("ProfileScreen", "Current user state: $userState")
+
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(
                 brush = Brush.verticalGradient(
-                   // colors = listOf(Color(0xFFEDE7F6), Color(0xFF80DEEA))
                     colors = listOf(Color(0xFFE8F5E9), Color(0xFF388E3C))
                 )
             )
     ) {
-        // Custom curved background
         CurvedBackground()
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp), // Add padding to the entire screen
+                .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(60.dp)) // Spacing from the top
+            Spacer(modifier = Modifier.height(60.dp))
 
             // Avatar with shadow
             Box(
                 modifier = Modifier
                     .size(100.dp)
                     .clip(CircleShape)
-                    .border(BorderStroke(.2.dp, Color.Green), CircleShape)
+                    .border(BorderStroke(0.2.dp, Color.Green), CircleShape)
                     .background(Color.White),
                 contentAlignment = Alignment.Center
             ) {
-                // Example profile image (use your own resource)
                 Image(
                     painter = painterResource(id = R.drawable.totoro),
                     contentDescription = "Profile Image",
@@ -144,55 +161,37 @@ fun ProfileScreen(navController: NavController) {
             }
             Spacer(modifier = Modifier.height(16.dp))
 
-            // User Details Card
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(16.dp)),
                 elevation = CardDefaults.elevatedCardElevation(4.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White)
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFF0F9FF))
             ) {
                 Column(
-                    modifier = Modifier
-                        .padding(16.dp),
+                    modifier = Modifier.padding(16.dp),
                     horizontalAlignment = Alignment.Start
                 ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth()
-                            .padding(bottom = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Column (
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ){
-                            Text(
-                                text = "Ramayya",
-                                fontSize = 20.sp,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(bottom = 4.dp),
-                                color = Color(0xFF2E7D32)
-                            )
-                            Text(
-                                text = "User Id: 5613312982",
-                                fontSize = 14.sp,
-                                color = Color.Gray,
-                                modifier = Modifier.padding(bottom = 16.dp)
-                            )
-                        }
+                    userState?.let { user ->
+                        UserDetailRow(label = "Name", value = user.name) { newName ->
+                            userViewModel.updateUserDetails(newName, user.mobileNumber)
                         }
 
-                    UserDetailRow(label = "Name", value = "Ramayya Suresh")
-                    UserDetailRow(label = "Email", value = "Ramayyasuresh2004@gmail.com")
-                    UserDetailRow(label = "Password", value = "*******")
-                    UserDetailRow(label = "Mobile Number", value = "8248678540")
+                        UserDetailRow(label = "Email", value = user.email) {} // Email non-editable
+
+                        UserDetailRow(label = "Mobile Number", value = user.mobileNumber) { newMobileNumber ->
+                            userViewModel.updateUserDetails(user.name, newMobileNumber)
+                        }
+                    }
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    // Update Profile Button
                     Button(
-                        onClick = { /* Handle Update Profile */ },
+                        onClick = {
+                            userState?.let { user ->
+                                userViewModel.updateUserDetails(user.name, user.mobileNumber)
+                            }
+                        },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color(0xFF388E3C),
                             contentColor = Color.White
@@ -204,11 +203,20 @@ fun ProfileScreen(navController: NavController) {
                     ) {
                         Text(text = "UPDATE PROFILE")
                     }
+
+                    updateStatus?.let { result ->
+                        if (result.isSuccess) {
+                            Toast.makeText(context, "Profile updated successfully!", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(context, result.exceptionOrNull()?.message, Toast.LENGTH_SHORT).show()
+                        }
+                    }
                 }
             }
         }
     }
 }
+
 
 @Composable
 fun CurvedBackground() {
@@ -217,7 +225,7 @@ fun CurvedBackground() {
         .height(200.dp)) {
         val path = Path().apply {
             moveTo(0f, size.height * 0.5f)
-            quadraticBezierTo(
+            quadraticTo(
                 size.width * 0.5f, size.height,
                 size.width, size.height * 0.5f
             )
@@ -233,26 +241,71 @@ fun CurvedBackground() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UserDetailRow(label: String, value: String) {
-    Column(modifier = Modifier.padding(vertical = 4.dp)) {
-        Text(
-            text = label,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = Color.Gray
-        )
-        Text(
-            text = value,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Normal,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-    }
-}
+fun UserDetailRow(label: String, value: String, onValueChange: (String) -> Unit) {
+    var isEditing by remember { mutableStateOf(false) }
+    var textFieldValue by remember { mutableStateOf(value) }
 
-@Preview(showBackground = true)
-@Composable
-fun PreviewKrishiMitrProfileUI() {
-    ProfileScreen(navController = rememberNavController())
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Column(
+            modifier = Modifier.weight(1f)
+        ) {
+            Text(
+                text = label,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Color.Gray
+            )
+
+            if (isEditing) {
+                TextField(
+                    value = textFieldValue,
+                    onValueChange = {
+                        textFieldValue = it
+                        onValueChange(it)
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    colors = TextFieldDefaults.textFieldColors(
+                        containerColor = Color.Transparent
+                    ),
+                    textStyle = TextStyle(
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Normal,
+                        color = Color.Black
+                    )
+                )
+            } else {
+                Text(
+                    text = value,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Normal,
+                    modifier = Modifier.padding(bottom = 8.dp),
+                    color = Color.Black
+                )
+            }
+        }
+
+        if (label != "Email") {
+            IconButton(onClick = {
+                isEditing = !isEditing
+                if (!isEditing) {
+                    textFieldValue = value
+                }
+            }) {
+                Icon(
+                    imageVector = if (isEditing) Icons.Default.Check else Icons.Default.Edit,
+                    contentDescription = if (isEditing) "Save" else "Edit",
+                    tint = if (isEditing) Color.Green else Color.Gray
+                )
+            }
+        }
+    }
 }
