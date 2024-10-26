@@ -204,9 +204,12 @@ Column (
                                 Log.w(TAG, "Error adding user data", e)
                             }
                     }
-                    // ... navigate to next screen or update UI ...
+                    Toast.makeText(context, "Sign Up Successful", Toast.LENGTH_SHORT).show()
+                    navController.navigate(Screen.Main.route)
                 } else {
                     // If sign in fails, display a message to the user.
+                    val errorMessage = task.exception?.localizedMessage ?: "Unknown error occurred"
+                    Toast.makeText(context, "Sign Up Failed: $errorMessage", Toast.LENGTH_LONG).show()
                     Log.w(TAG, "createUserWithEmail:failure", task.exception)
                     // ... display error message ...
                 }

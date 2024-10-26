@@ -25,6 +25,7 @@ import com.example.krishimitr.screens.ContactScreen
 import com.example.krishimitr.screens.HistoryScreen
 import com.example.krishimitr.screens.MainScreen
 import com.example.krishimitr.screens.ProfileScreen
+import com.example.krishimitr.screens.ManageAccountScreen
 import com.example.krishimitr.ui.theme.KrishiMitrTheme
 import com.google.android.gms.auth.api.signin.GoogleSignIn.getClient
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -79,6 +80,9 @@ class MainActivity : ComponentActivity() {
                     }
                     composable(route = Screen.SignUp.route) {
                         SignUpScreen(navController = navController)
+                    }
+                    composable(route = Screen.ManageAccount.route) {
+                        ManageAccountScreen(navController = navController)
                     }
                 }
             }

@@ -21,11 +21,21 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Class
+import androidx.compose.material.icons.filled.ContactSupport
+import androidx.compose.material.icons.filled.Help
+import androidx.compose.material.icons.filled.LocalPhone
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material.icons.filled.ManageAccounts
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.filled.PrivacyTip
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -51,8 +61,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -72,11 +84,12 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import coil.size.Size
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(navController: NavController){
+fun MainScreen(navController: NavController) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val googleSignInClient = getClient(context, DEFAULT_SIGN_IN)
@@ -84,13 +97,11 @@ fun MainScreen(navController: NavController){
     val nestedNavController = rememberNavController()
     val navBackStackEntry by nestedNavController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
-
     var userName by remember { mutableStateOf("Loading...") }
     var userEmail by remember { mutableStateOf("Loading...") }
     var userPhotoUrl by remember { mutableStateOf<String?>(null) }
     val auth: FirebaseAuth = Firebase.auth
     val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
-
 
     // Fetch user details
     LaunchedEffect(Unit) {
@@ -116,23 +127,13 @@ fun MainScreen(navController: NavController){
         }
     }
 
-
-
-
     ModalNavigationDrawer(
-
-       // gesturesEnabled = currentRoute!=Screen.McqTestScreen.route,
         drawerState = drawerState,
-
         drawerContent = {
-            //if (currentRoute!= Screen.McqTestScreen.route) {
             ModalDrawerSheet(
                 drawerContainerColor = Color.White,
-                modifier = Modifier
-                    .width(280.dp)
-
+                modifier = Modifier.width(280.dp)
             ) {
-
                 Column {
                     Box(
                         modifier = Modifier
@@ -148,18 +149,13 @@ fun MainScreen(navController: NavController){
                                     .size(90.dp)
                                     .clip(CircleShape)
                                     .background(Color.White)
-                                    .border(
-                                        BorderStroke(3.dp, Color.White),
-                                        CircleShape
-                                    )
+                                    .border(BorderStroke(3.dp, Color.White), CircleShape)
                             ) {
                                 AsyncImage(
                                     model = ImageRequest.Builder(LocalContext.current)
-                                        .data(data = userPhotoUrl)
-                                        .apply(block = fun ImageRequest.Builder.() {
-                                            crossfade(true)
-                                            size(Size.ORIGINAL) // Scale down the image to fit the required size
-                                        }).build(),
+                                        .data(userPhotoUrl)
+                                        .apply { crossfade(true); size(Size.ORIGINAL) }
+                                        .build(),
                                     contentDescription = null,
                                     modifier = Modifier
                                         .fillMaxSize()
@@ -170,197 +166,115 @@ fun MainScreen(navController: NavController){
                             Column {
                                 Text(
                                     text = userName,
-                                    style = TextStyle(
-                                        color = Color.White,
-                                        fontSize = 17.sp
-                                    )
+                                    style = TextStyle(color = Color.White, fontSize = 17.sp)
                                 )
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
                                     text = userEmail,
                                     style = TextStyle(
-                                        color = Color.White,
-                                        fontSize = 14.sp,
+                                        color = Color.White, fontSize = 14.sp,
                                         fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
                                     )
                                 )
                             }
                         }
                     }
+                    Text("Account", style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold), modifier = Modifier.padding(16.dp))
+                    NavigationDrawerItem("Manage Account", Icons.Default.ManageAccounts, nestedNavController, "manage_account",drawerState,scope)
+                    NavigationDrawerItem("Location", Icons.Default.LocationOn, navController, "location",drawerState,scope)
+                    NavigationDrawerItem("Theme", Icons.Default.Palette, navController, "theme",drawerState,scope)
 
-                    HorizontalDivider()
+                    Text("Support", style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold), modifier = Modifier.padding(16.dp))
+                    NavigationDrawerItem("Contact Us", Icons.Default.LocalPhone, navController, "contact_us",drawerState,scope)
+                    NavigationDrawerItem("Help Us", Icons.Default.Help, navController, "help",drawerState,scope)
 
-                    NavigationDrawerItem(
-                        shape = RectangleShape,
-                        colors = NavigationDrawerItemDefaults.colors(
-                            selectedContainerColor = Color.Gray,
-                            unselectedContainerColor = Color.White
-                        ),
-                        label = {
-                            Text(
-                                text = "Share App",
-                                style = TextStyle(color = Color.Black)
-                            )
-                        },
-                        selected = false,
-                        icon = {
-                            Icon(
-                                imageVector = Icons.Default.Share,
-                                contentDescription = "Share App",
-                                tint = Color.Black
+                    Text("About", style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold), modifier = Modifier.padding(16.dp))
+                    NavigationDrawerItem("Privacy Policy", Icons.Default.PrivacyTip, navController, "privacy_policy",drawerState,scope)
 
-                            )
-                        },
-                        onClick = {
-                            scope.launch {
-                                drawerState.close()
+                    NavigationDrawerItem("Logout", Icons.Default.Logout, navController, "logout",drawerState,scope) {
+                        Firebase.auth.signOut()
+                        googleSignInClient.signOut().addOnCompleteListener {
+                            Toast.makeText(context, "Logging out...", Toast.LENGTH_SHORT).show()
+                            navController.navigate(Screen.Login.route) {
+                                popUpTo(0) { inclusive = true }
                             }
                         }
-                    )
-
-                    NavigationDrawerItem(
-                        shape = RectangleShape,
-                        colors = NavigationDrawerItemDefaults.colors(
-                            selectedContainerColor = Color.Gray,
-                            unselectedContainerColor = Color.White
-                        ),
-                        label = {
-                            Text(
-                                text = "Need Help",
-                                style = TextStyle(color = Color.Black)
-                            )
-                        },
-                        selected = false,
-                        icon = {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.Help,
-                                contentDescription = "Contact Us?",
-                                tint = Color.Black
-
-                            )
-                        },
-                        onClick = {
-                            scope.launch {
-                                drawerState.close()
-                            }
-                        }
-                    )
-                    NavigationDrawerItem(
-                        shape = RectangleShape,
-                        colors = NavigationDrawerItemDefaults.colors(
-                            selectedContainerColor = Color.Gray,
-                            unselectedContainerColor = Color.White
-                        ),
-                        label = {
-                            Text(
-                                text = "Logout",
-                                style = TextStyle(color = Color.Black)
-                            )
-                        },
-                        selected = false,
-                        icon = {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.Logout,
-                                contentDescription = "Logout",
-                                tint = Color.Black
-                            )
-                        },
-                        onClick = {
-                            Firebase.auth.signOut()
-                            googleSignInClient.signOut().addOnCompleteListener {
-                                Toast.makeText(context, "Logging out...", Toast.LENGTH_SHORT)
-                                    .show()
-                                navController.navigate(Screen.Login.route){
-                                    popUpTo(0){
-                                        inclusive= true
-                                    }
-                                }
-                            }
-                        }
-                    )
-
-//                    }
-
+                    }
                 }
             }
-
         }
     ) {
-
-
         Scaffold(
             containerColor = Color.White,
             topBar = {
-                if(currentRoute==Screen.Home.route) {
+                if (currentRoute == Screen.Home.route) {
                     CenterAlignedTopAppBar(
-                        colors = topAppBarColors(
-                            containerColor = Color.White,
-                        ),
-                        title = {
-
-                            Text(
-
-                                text = "KrishiMitr",
-                                style = TextStyle(
-                                    color = Color.Black,
-                                    fontSize = 20.sp
-                                )
-                            )
-                        },
+                        colors = topAppBarColors(containerColor = Color.White),
+                        title = { Text("KrishiMitr", style = TextStyle(color = Color.Black, fontSize = 20.sp)) },
                         navigationIcon = {
-                            IconButton(onClick = {
-                                scope.launch {
-                                    drawerState.open()
-                                }
-                            }) {
-                                Icon(
-                                    imageVector = Icons.Filled.Menu,
-                                    contentDescription = "Menu",
-                                    modifier = Modifier.size(30.dp),
-                                    Color.Black
-                                )
+                            IconButton(onClick = { scope.launch { drawerState.open() } }) {
+                                Icon(Icons.Filled.Menu, contentDescription = "Menu", modifier = Modifier.size(30.dp), tint = Color.Black)
                             }
                         },
                         actions = {
-                            IconButton(onClick = {
-                                Toast.makeText(context, "No new notifications", Toast.LENGTH_SHORT)
-                                    .show()
-                            }) {
+                            IconButton(onClick = { Toast.makeText(context, "No new notifications", Toast.LENGTH_SHORT).show() }) {
+                                Icon(Icons.Default.Notifications, contentDescription = "Notifications", modifier = Modifier.size(30.dp), tint = Color.Black)
+                            }
+                        }
+                    )
+                }
+                if(currentRoute==Screen.ManageAccount.route){
+                    CenterAlignedTopAppBar(
+                        colors = topAppBarColors(containerColor = Color.White),
+                        title = { Text("Manage Account",color=Color.Black) },
+                        navigationIcon = {
+                            IconButton(onClick = { nestedNavController.popBackStack() }) {
                                 Icon(
-                                    imageVector = Icons.Default.Notifications,
-                                    contentDescription = "Notifications",
-                                    modifier = Modifier.size(30.dp),
-                                    Color.Black
+                                    imageVector = Icons.Default.ArrowBack,
+                                    contentDescription = "Back",
+                                    tint = Color.Black
                                 )
                             }
                         }
 
-
                     )
-
-
                 }
             },
-            bottomBar = {
-
-                BottomNavigationBar(
-                    navController = nestedNavController,
-                    currentRoute = currentRoute
-                )
-            }
-        ) {
-            innerPadding ->
-            Box(modifier = Modifier
-                .padding(innerPadding)
-
-            ) {
+            bottomBar = { BottomNavigationBar(navController = nestedNavController, currentRoute = currentRoute) }
+        ) { innerPadding ->
+            Box(modifier = Modifier.padding(innerPadding)) {
                 NestedNavHost(navController = nestedNavController)
             }
         }
-
     }
+}
 
-
+@Composable
+fun NavigationDrawerItem(
+    label: String,
+    icon: ImageVector,
+    navController: NavController,
+    route: String = "",
+    drawerState: DrawerState,
+    scope: CoroutineScope,
+    onClick: () -> Unit = {
+        scope.launch {
+            drawerState.close() // Close the drawer
+        }
+        navController.navigate(route)
+    }
+) {
+    NavigationDrawerItem(
+        label = { Text(label, style = TextStyle(color = Color.Black)) },
+        icon = { Icon(icon, contentDescription = null, tint = Color.Black) },
+        selected = false,
+        onClick = onClick,
+        shape = RectangleShape,
+        colors = NavigationDrawerItemDefaults.colors(
+            selectedContainerColor = Color.Gray,
+            unselectedContainerColor = Color.White
+        )
+    )
 }
 
 
@@ -389,7 +303,8 @@ fun NestedNavHost(navController: NavController) {
         composable(Screen.History.route) {
             HistoryScreen(navController = navController)
         }
-
-
+        composable(Screen.ManageAccount.route) {
+            ManageAccountScreen(navController = navController)
+        }
     }
 }

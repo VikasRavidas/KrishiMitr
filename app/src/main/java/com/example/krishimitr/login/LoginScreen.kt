@@ -35,6 +35,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
@@ -141,24 +142,15 @@ fun LoginScreen(navController: NavController,mGoogleSignInClient: GoogleSignInCl
 
         ) {
 
-
-//            WaveHeader()
-            // Rest of the login form below the wave
-            //Spacer(modifier = , Modifier.height(20.dp)) // Spacing between wave and login form
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(20.dp) // Adjust height as necessary for the wave
-                    .background(Color.White)
-            )
             Image(
                 painter =
                 painterResource(id = R.drawable.wave),
                 contentDescription = "Top wave",
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp)
-                    .graphicsLayer { scaleX=1f;scaleY=0.9f }
+                    .height(180.dp),
+//                    .graphicsLayer { scaleX=1f;scaleY=0.8f }
+                contentScale = ContentScale.Crop
             )
             Text(
                 text = "Welcome Back",
